@@ -21,8 +21,31 @@ Functions in `libfuture.a`:
 - `getopt`, `getopt_long` (GNU style, with argument permutation)
 - `basename`, `dirname`
 - `usleep`, `clock_gettime`, `cfmakeraw`
+- Wrappers for `tcgetattr`, `tcsetattr`, `cfsetospeed`, `cfsetispeed`,
+  `cfgetospeed` and `cfgetispeed`. They add `CRTSCTS` and `B57600` for
+  the serial driver. `future.h` maps the names to the wrappers.
 
 Headers that A/UX does not have: `stdint.h`, `getopt.h`, `libgen.h`.
+
+`<future/tiocm.h>` adds the `TIOCMGET`, `TIOCMBIS` and `TIOCMBIC`
+ioctls for DTR and CTS. It replaces `ioctl()` with a wrapper, so it is
+not part of `future.h`. Include it where the program uses these ioctls.
+
+## Serial ports
+
+The A/UX serial driver differs from Linux and BSD:
+
+- `CRTSCTS` selects the `UIOCDTRFLOW` mode. The driver stops sending
+  while the handshake input (HSKi) is negated. It does not drive the
+  handshake output, so there is no input flow control.
+- `B57600` uses the `TCSETBAUD` ioctl. 115200 is not possible.
+- The Mac serial ports have no RTS pin. RTS reads as set and cannot be
+  cleared.
+- The driver asserts DTR whenever it applies the termios settings.
+  `tcsetattr()` clears it again if it was lowered with `TIOCMBIC`.
+- The kernel does not store `CRTSCTS` and `B57600` in the termios
+  settings. `tcgetattr()` reads the flow control mode from the driver,
+  but reports `B57600` only if the same process set it.
 
 ## Building
 

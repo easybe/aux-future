@@ -57,6 +57,28 @@ int usleep(unsigned long usec);
 struct termios;
 void cfmakeraw(struct termios *tio);
 
+/*
+ * Serial port extensions, see src/termios.c. CRTSCTS selects the
+ * UIOCDTRFLOW mode of the serial driver. B57600 is set with the
+ * TCSETBAUD ioctl. The wrappers below replace the termios functions.
+ */
+#define CRTSCTS 0x40000000UL
+#define B57600 0010001
+
+int future_tcgetattr(int fd, struct termios *tio);
+int future_tcsetattr(int fd, int action, const struct termios *tio);
+int future_cfsetospeed(struct termios *tio, unsigned int speed);
+int future_cfsetispeed(struct termios *tio, unsigned int speed);
+unsigned int future_cfgetospeed(const struct termios *tio);
+unsigned int future_cfgetispeed(const struct termios *tio);
+
+#define tcgetattr future_tcgetattr
+#define tcsetattr future_tcsetattr
+#define cfsetospeed future_cfsetospeed
+#define cfsetispeed future_cfsetispeed
+#define cfgetospeed future_cfgetospeed
+#define cfgetispeed future_cfgetispeed
+
 struct timespec {
     long tv_sec;
     long tv_nsec;
