@@ -39,3 +39,6 @@ to `$(PREFIX)/lib`. `DESTDIR` is supported.
 
 `-D_POSIX_SOURCE` makes the A/UX headers declare `read()`, `open()`,
 `stat()` and `O_NONBLOCK`. It needs `-lposix`.
+
+In the guest, the library works with gcc. The native cc is a K&R
+compiler and rejects the prototypes in the headers.
